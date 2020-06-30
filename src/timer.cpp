@@ -1,11 +1,16 @@
-#include "timer.h"
 #include <Arduino.h>
+#include "timer.h"
+#include "modes.h"
 
 uint32_t timerLastCheckTime = 0;
-int timerRemainingMinutes = TIMER_DISABLED;
+int timerRemainingMinutes = 0;
+bool timerEnabled = false;
 
 void updateTimer()
 {
+    if (!timerEnabled)
+        return;
+
     uint32_t elapsed = millis() - timerLastCheckTime;
 
     if (elapsed / 60000)
@@ -15,6 +20,12 @@ void updateTimer()
 #endif
         timerRemainingMinutes -= 1;
         timerLastCheckTime = millis();
+
+        if (timerRemainingMinutes == 0)
+        {
+            timerEnabled = false;
+            setPower(false);
+        }
     }
 }
 
@@ -40,10 +51,15 @@ void setTimer(int newTimerMinutes)
         newTimerMinutes = TIMER_DISABLED;
 
     timerRemainingMinutes = newTimerMinutes;
+    timerEnabled = timerRemainingMinutes > 0;
 
     if (timerRemainingMinutes > 0)
+    {
         timerLastCheckTime = millis();
 
+        if (!powerOn())
+            setPower(true);
+    }
 #ifdef debug
     Serial.println(timerRemainingMinutes);
 #endif
@@ -51,11 +67,13 @@ void setTimer(int newTimerMinutes)
 
 void changeTimer()
 {
+    int remainingHours = (timerRemainingMinutes / 60);
+
 #ifdef debug
+    Serial.print("changeTimer() -> remainingHours = ");
+    Serial.println(remainingHours);
     Serial.print("changeTimer()-> mins = ");
 #endif
-
-    int remainingHours = (timerRemainingMinutes / 60);
 
     int mins = timerRemainingMinutes == TIMER_DISABLED
                    ? 60

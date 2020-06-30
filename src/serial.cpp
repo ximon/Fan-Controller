@@ -40,6 +40,9 @@ void processSerial()
 
         switch (received)
         {
+        case 'x':
+            setTimer(1);
+            break;
         case '?':
             sendStatus();
             break;

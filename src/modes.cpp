@@ -3,8 +3,6 @@
 #include "timer.h"
 #include "pins.h"
 
-#define debug
-
 int fluctuateTimeMin = 1000;
 int fluctuateTimeMax = 8000;
 

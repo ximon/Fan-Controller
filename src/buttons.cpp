@@ -5,8 +5,6 @@
 #include "modes.h"
 #include "timer.h"
 
-#define debug
-
 bool buttonTone = false;
 
 bool powerPressed;
@@ -163,9 +161,6 @@ void checkButtons()
             lastButtonPressTime = millis();
             timerPressed = true;
             addButton(BTN_TIMER);
-
-            if (!powerOn())
-                setPower(true);
 
 #ifdef debug
             Serial.println("Timer Pressed");

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 const int TIMER_DISABLED = 0;
-const int TIMER_MINS_MIN = 1 * 60;
+const int TIMER_MINS_MIN = 1;
 const int TIMER_MINS_MAX = 14 * 60;
 
 void updateTimer();

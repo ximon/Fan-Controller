@@ -66,9 +66,6 @@ void processIR()
                     break;
                 }
 
-                if (!powerOn())
-                    setPower(true);
-
                 changeTimer();
                 addButton(BTN_TIMER);
                 break;
