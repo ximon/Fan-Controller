@@ -14,9 +14,24 @@ void sendStatus()
 {
     Serial.print(powerOn() ? "P" : "p");
     Serial.print(fluctuateOn() ? "F" : "f");
+    Serial.print(fluctuateWithPowerOn() ? "}" : "{");
     Serial.print(oscillateOn() ? "O" : "o");
+    Serial.print(oscillateWithPowerOn() ? ")" : "(");
 
     switch (speedLevel())
+    {
+    case 1:
+        Serial.print("l");
+        break;
+    case 2:
+        Serial.print("m");
+        break;
+    case 3:
+        Serial.print("h");
+        break;
+    }
+
+    switch (speedWithPowerOn())
     {
     case 1:
         Serial.print("L");
@@ -58,10 +73,10 @@ void processSerial()
         case 'o':
             setOscillate(false);
             break;
-        case '[':
+        case '{':
             setFluctuateWithPowerOn(false);
             break;
-        case ']':
+        case '}':
             setFluctuateWithPowerOn(true);
             break;
         case 'F':
@@ -70,10 +85,10 @@ void processSerial()
         case 'f':
             setFluctuate(false);
             break;
-        case '{':
+        case '(':
             setOscillateWithPowerOn(false);
             break;
-        case '}':
+        case ')':
             setOscillateWithPowerOn(true);
             break;
 

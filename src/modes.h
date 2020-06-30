@@ -14,8 +14,11 @@ bool speedLow();
 bool speedMed();
 bool speedHigh();
 bool powerOn();
+
 bool oscillateOn();
+bool oscillateWithPowerOn();
 bool fluctuateOn();
+bool fluctuateWithPowerOn();
 
 void setFluctuateWithPowerOn(bool value);
 void setFluctuate(bool value);
@@ -24,6 +27,7 @@ void setOscillateWithPowerOn(bool value);
 void setOscillate(bool value);
 
 void setSpeedWithPowerOn(int speedLevel);
+int speedWithPowerOn();
 void setSpeed(int speedLevel);
 void changeSpeed();
 

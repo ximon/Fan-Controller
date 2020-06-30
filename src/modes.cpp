@@ -16,9 +16,9 @@ int speedBeforeFluctuate = SPEED_LOW;
 int fluctuateSpeed = SPEED_LOW;
 uint32_t nextFluctuateSpeedChange = 0;
 
-bool oscillateWithPowerOn = false;
-bool fluctuateWithPowerOn = false;
-int speedWithPowerOn = SPEED_LOW;
+bool oscillateWithPower = false;
+bool fluctuateWithPower = false;
+int speedWithPower = SPEED_LOW;
 
 void setupOutputs()
 {
@@ -70,13 +70,18 @@ int speedLevel() { return speed; }
 bool speedLow() { return speed == SPEED_LOW; }
 bool speedMed() { return speed == SPEED_MED; }
 bool speedHigh() { return speed == SPEED_HIGH; }
+
 bool powerOn() { return speed != SPEED_OFF; }
+
+bool oscillateWithPowerOn() { return oscillateWithPower; }
 bool oscillateOn() { return oscillate; }
+
+bool fluctuateWithPowerOn() { return fluctuateWithPower; }
 bool fluctuateOn() { return fluctuate; }
 
 void setFluctuateWithPowerOn(bool value)
 {
-    fluctuateWithPowerOn = value;
+    fluctuateWithPower = value;
 }
 
 void setFluctuate(bool value)
@@ -107,7 +112,7 @@ void setFluctuate(bool value)
 
 void setOscillateWithPowerOn(bool value)
 {
-    oscillateWithPowerOn = value;
+    oscillateWithPower = value;
 }
 
 void setOscillate(bool value)
@@ -125,9 +130,14 @@ void setOscillate(bool value)
 #endif
 }
 
+int speedWithPowerOn()
+{
+    return speedWithPower;
+}
+
 void setSpeedWithPowerOn(int speedLevel)
 {
-    speedWithPowerOn = speedLevel;
+    speedWithPower = speedLevel;
 }
 
 void setSpeed(int speedLevel)
@@ -169,9 +179,9 @@ void setPower(bool value)
 #ifdef debug
         Serial.println("Turning on");
 #endif
-        setSpeed(speedWithPowerOn);
-        setOscillate(oscillateWithPowerOn);
-        setFluctuate(fluctuateWithPowerOn);
+        setSpeed(speedWithPower);
+        setOscillate(oscillateWithPower);
+        setFluctuate(fluctuateWithPower);
     }
     else
     {
