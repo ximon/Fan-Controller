@@ -58,7 +58,22 @@ void checkKonami()
     buttonTone = !buttonTone;
 }
 
-void checkButtons()
+void updatePowerOnSettings()
+{
+    if (digitalRead(Fluctuate_Button))
+       setFluctuateWithPowerOn(fluctuateOn());
+    
+    if (digitalRead(Oscillate_Button)
+        setOscillateWithPowerOn(oscillateOn());
+
+    if (digitalRead(Speed_Button)
+        setSpeedWithPowerOn(speedLevel());
+            
+    if (digitalRead(Timer_Button)
+        setTimerWithPowerOn(hoursRemaining() * 60);
+}
+
+void checkPowerButton()
 {
     if (!digitalRead(Power_Button))
     {
@@ -67,10 +82,32 @@ void checkButtons()
             lastButtonPressTime = millis();
             powerPressed = true;
             addButton(BTN_POWER);
-
+            
 #ifdef debug
             Serial.println("Power Pressed");
 #endif
+
+            if (powerOn())
+            {
+                delay(50);
+
+                if (digitalRead(Power_Button))
+                {
+#ifdef debug
+                    Serial.println("Power Held");
+#endif
+                    //wait whilst the button is held
+                    while (digitalRead(Power_Button))
+                    {
+                        updatePowerOnSettings();
+                    }
+                }
+            }
+
+            
+
+            if (otherButtonPressed)
+                return;
 
             setPower(!powerOn());
         }
@@ -79,7 +116,10 @@ void checkButtons()
     {
         powerPressed = false;
     }
+}
 
+void checkFluctuateButton()
+{
     if (!digitalRead(Fluctuate_Button))
     {
         if (!fluctuatePressed)
@@ -101,7 +141,10 @@ void checkButtons()
     {
         fluctuatePressed = false;
     }
+}
 
+void checkOscillateButton() 
+{
     if (!digitalRead(Oscillate_Button))
     {
         if (!oscillatePressed)
@@ -114,11 +157,11 @@ void checkButtons()
             Serial.println("Oscillate Pressed");
 #endif
 
-            //this one is different, turning on turns on the oscillation, so toggling it turns it back off
+//this one is different, turning on turns on the oscillation, so toggling it turns it back off
             if (!powerOn())
             {
                 setPower(true);
-                setOscillate(true);
+                setOscillate(true); 
             }
             else
             {
@@ -130,7 +173,10 @@ void checkButtons()
     {
         oscillatePressed = false;
     }
+}
 
+void checkSpeedButton() 
+{
     if (!digitalRead(Speed_Button))
     {
         if (!speedPressed)
@@ -138,7 +184,7 @@ void checkButtons()
             lastButtonPressTime = millis();
             speedPressed = true;
             addButton(BTN_SPEED);
-
+            
 #ifdef debug
             Serial.println("Speed Pressed");
 #endif
@@ -153,7 +199,10 @@ void checkButtons()
     {
         speedPressed = false;
     }
+}
 
+void checkTimerButton() 
+{
     if (!digitalRead(Timer_Button))
     {
         if (!timerPressed)
@@ -170,7 +219,7 @@ void checkButtons()
         }
         else
         {
-            if (millis() - 1000 > lastButtonPressTime && lastButtonPressTime > 0)
+            if (millis() - 1000 > lastButtonPressTime && lastButtonPressTime > 0) 
             {
                 //button is held for 1s+
                 setTimer(TIMER_DISABLED);
@@ -181,6 +230,15 @@ void checkButtons()
     {
         timerPressed = false;
     }
+}
+
+void checkButtons()
+{
+    checkPowerButton();
+    checkFluctuateButton();
+    checkOscillateButton();
+    checkSpeedButton();
+    checkTimerButton();
 
     checkKonami();
 }

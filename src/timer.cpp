@@ -5,6 +5,7 @@
 uint32_t timerLastCheckTime = 0;
 int timerRemainingMinutes = 0;
 bool timerEnabled = false;
+int timerWithPower = TIMER_DISABLED;
 
 void updateTimer()
 {
@@ -35,6 +36,13 @@ int hoursRemaining()
         return 0;
 
     return ((timerRemainingMinutes - 1) / 60) + 1;
+}
+
+int timerWithPowerOn() { return timerWithPower; }
+
+void setTimerWithPowerOn(int minutes)
+{
+    timerWithPower = minutes;
 }
 
 void setTimer(int newTimerMinutes)
