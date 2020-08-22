@@ -13,17 +13,6 @@ const int LOOP_TIME = 5; //ms
 
 uint32_t lastLoopTime;
 
-void setup()
-{
-  setupSerial();
-  setupDisplay();
-  setupOutputs();
-  setupIR();
-  setupBuzzer();
-
-  playOnTone();
-}
-
 void timerElapsed()
 {
   disableDisplay();
@@ -34,6 +23,18 @@ void timerElapsed()
   updateOutputs();
 
   updateDisplay();
+}
+
+#ifndef UNIT_TEST
+void setup()
+{
+  setupSerial();
+  setupDisplay();
+  setupOutputs();
+  setupIR();
+  setupBuzzer();
+
+  playOnTone();
 }
 
 void loop()
@@ -47,3 +48,4 @@ void loop()
   processIR();
   processSerial();
 }
+#endif

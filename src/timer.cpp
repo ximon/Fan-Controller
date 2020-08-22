@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "modes.h"
 
-uint32_t timerLastCheckTime = 0;
+unsigned long timerLastCheckTime = 0;
 int timerRemainingMinutes = 0;
 bool timerEnabled = false;
 
@@ -11,7 +11,7 @@ void updateTimer()
     if (!timerEnabled)
         return;
 
-    uint32_t elapsed = millis() - timerLastCheckTime;
+    unsigned long elapsed = millis() - timerLastCheckTime;
 
     if (elapsed / 60000)
     {
