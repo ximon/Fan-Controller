@@ -56,13 +56,13 @@ void updateOutputs()
     if (oscillateOn())
         digitalWrite(Oscillate_Pin, LOW);
 
-    if (speedLevel == SPEED_LOW)
+    if (speedHigh())
         digitalWrite(HighSpeed_Pin, LOW);
 
-    if (speedLevel == SPEED_MED)
+    if (speedMed())
         digitalWrite(MediumSpeed_Pin, LOW);
 
-    if (speedLevel == SPEED_HIGH)
+    if (speedLow())
         digitalWrite(LowSpeed_Pin, LOW);
 }
 
