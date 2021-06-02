@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #ifndef __PINS_H__
 #define __PINS_H_
 

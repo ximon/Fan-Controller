@@ -7,7 +7,6 @@ const int BTN_POWER = 2;
 const int BTN_TIMER = 3;
 const int BTN_OSCILLATE = 4;
 
-void addButton(int button);
 void checkButtons();
 
 #endif

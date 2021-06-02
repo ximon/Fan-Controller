@@ -1,10 +1,16 @@
 #ifndef __MODES_H__
 #define __MODES_H__
 
-const int SPEED_OFF = 0;
-const int SPEED_LOW = 1;
-const int SPEED_MED = 2;
-const int SPEED_HIGH = 3;
+const int FAN_SPEED_OFF = 0;
+const int FAN_SPEED_LOW = 1;
+const int FAN_SPEED_MED = 2;
+const int FAN_SPEED_HIGH = 3;
+
+const int OSCILLATE_SPEED_LOW = 180;
+const int OSCILLATE_SPEED_MED = 70;
+const int OSCILLATE_SPEED_HIGH = 30;
+
+
 
 void setupOutputs();
 void updateOutputs();

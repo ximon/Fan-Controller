@@ -1,29 +1,45 @@
 #include <Arduino.h>
+#include <Servo.h>
 #include "modes.h"
 #include "timer.h"
 #include "pins.h"
 
+#define debug
+
+Servo oscillateServo;
+
 int fluctuateTimeMin = 1000;
 int fluctuateTimeMax = 8000;
 
-int fluctuateSpeedMin = SPEED_LOW;
-int fluctuateSpeedMax = SPEED_HIGH;
+int fluctuateSpeedMin = FAN_SPEED_LOW;
+int fluctuateSpeedMax = FAN_SPEED_HIGH;
 
-int speed = SPEED_OFF;  //fan speed
+int speed = FAN_SPEED_OFF;  //fan speed
+
 bool oscillate = false; //fan oscillation
-bool fluctuate = false; //fluctuate speeds
-int speedBeforeFluctuate = SPEED_LOW;
-int fluctuateSpeed = SPEED_LOW;
-uint32_t nextFluctuateSpeedChange = 0;
+#define OSCILLATE_MIN_ANGLE 5
+#define OSCILLATE_MAX_ANGLE 130
+#define OSCILLATE_START_ANGLE OSCILLATE_MAX_ANGLE /2 + OSCILLATE_MIN_ANGLE
+int oscillateUpdateDelay = OSCILLATE_SPEED_LOW; //ms
+int oscillateAngle = OSCILLATE_START_ANGLE;
+int oscillateDelta = 1;
+unsigned long oscillateLastUpdate;
+
+bool fluctuate = false;
+int speedBeforeFluctuate = FAN_SPEED_LOW;
+int fluctuateSpeed = FAN_SPEED_LOW;
+unsigned long nextFluctuateSpeedChange = 0;
 
 bool oscillateWithPower = false;
 bool fluctuateWithPower = false;
-int speedWithPower = SPEED_LOW;
+int speedWithPower = FAN_SPEED_LOW;
 
 void setupOutputs()
 {
+    oscillateServo.attach(Oscillate_Pin);
+    oscillateServo.write(oscillateAngle);
+
     //INPUT so that the pins are Hi-Z
-    pinMode(Oscillate_Pin, INPUT);
     pinMode(HighSpeed_Pin, INPUT);
     pinMode(MediumSpeed_Pin, INPUT);
     pinMode(LowSpeed_Pin, INPUT);
@@ -38,6 +54,10 @@ void updateFluctuateSpeed()
     }
 }
 
+bool oscillateNeedsUpdate() { 
+    return millis() - oscillateLastUpdate >= oscillateUpdateDelay;
+}
+
 void updateOutputs()
 {
     if (fluctuateOn())
@@ -46,15 +66,23 @@ void updateOutputs()
         speed = fluctuateSpeed;
     }
 
-    int speedLevel = speed;
-
-    pinMode(Oscillate_Pin, oscillateOn() ? OUTPUT : INPUT);
     pinMode(HighSpeed_Pin, speedHigh() ? OUTPUT : INPUT);
     pinMode(MediumSpeed_Pin, speedMed() ? OUTPUT : INPUT);
     pinMode(LowSpeed_Pin, speedLow() ? OUTPUT : INPUT);
 
-    if (oscillateOn())
-        digitalWrite(Oscillate_Pin, LOW);
+    if (oscillateOn() && oscillateNeedsUpdate())
+    {
+        oscillateLastUpdate = millis();
+
+        if (oscillateAngle <= OSCILLATE_MIN_ANGLE)
+            oscillateDelta = 1;
+
+        if (oscillateAngle >= OSCILLATE_MAX_ANGLE)
+            oscillateDelta = -1;
+
+        oscillateAngle += oscillateDelta;
+        oscillateServo.write(oscillateAngle);
+    }
 
     if (speedHigh())
         digitalWrite(HighSpeed_Pin, LOW);
@@ -67,11 +95,11 @@ void updateOutputs()
 }
 
 int speedLevel() { return speed; }
-bool speedLow() { return speed == SPEED_LOW; }
-bool speedMed() { return speed == SPEED_MED; }
-bool speedHigh() { return speed == SPEED_HIGH; }
+bool speedLow() { return speed == FAN_SPEED_LOW; }
+bool speedMed() { return speed == FAN_SPEED_MED; }
+bool speedHigh() { return speed == FAN_SPEED_HIGH; }
 
-bool powerOn() { return speed != SPEED_OFF; }
+bool powerOn() { return speed != FAN_SPEED_OFF; }
 
 bool oscillateWithPowerOn() { return oscillateWithPower; }
 bool oscillateOn() { return oscillate; }
@@ -148,11 +176,11 @@ void setSpeed(int speedLevel)
     Serial.print(" to ");
 #endif
 
-    if (speedLevel > SPEED_HIGH)
-        speedLevel = SPEED_HIGH;
+    if (speedLevel > FAN_SPEED_HIGH)
+        speedLevel = FAN_SPEED_HIGH;
 
-    if (speedLevel < SPEED_OFF)
-        speedLevel = SPEED_OFF;
+    if (speedLevel < FAN_SPEED_OFF)
+        speedLevel = FAN_SPEED_OFF;
 
     speed = speedLevel;
 
@@ -163,14 +191,14 @@ void setSpeed(int speedLevel)
 
 void changeSpeed()
 {
-    setSpeed(speed == SPEED_HIGH
-                 ? SPEED_LOW
+    setSpeed(speed == FAN_SPEED_HIGH
+                 ? FAN_SPEED_LOW
                  : speed + 1);
 }
 
 void setPower(bool value)
 {
-    //if we're already in the deisred state then dont change anything
+    //if we're already in the desired state then dont change anything
     if (powerOn() == value)
         return;
 
@@ -191,6 +219,6 @@ void setPower(bool value)
         setFluctuate(false);
         setOscillate(false);
         setTimer(TIMER_DISABLED);
-        setSpeed(SPEED_OFF);
+        setSpeed(FAN_SPEED_OFF);
     }
 }

@@ -1,7 +1,6 @@
 #include "buttons.h"
 #include <Arduino.h>
 #include "pins.h"
-#include "sounds.h"
 #include "modes.h"
 #include "timer.h"
 
@@ -13,50 +12,7 @@ bool oscillatePressed;
 bool speedPressed;
 bool timerPressed;
 unsigned int lastButtonPressTime;
-int buttonHistory[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int konami[10] = {BTN_FLUCTUATE, BTN_FLUCTUATE, BTN_OSCILLATE, BTN_OSCILLATE, BTN_SPEED, BTN_TIMER, BTN_SPEED, BTN_TIMER, BTN_POWER, BTN_POWER};
 
-void addButton(int button)
-{
-    if (buttonTone)
-        playButtonTone();
-
-    //shift buttons left one
-    for (int i = 1; i < 10; i++)
-    {
-        buttonHistory[i - 1] = buttonHistory[i];
-    }
-    buttonHistory[9] = button;
-
-#ifdef debug
-    Serial.print("ButtonHistory: [");
-    for (int i = 0; i < 10; i++)
-    {
-        Serial.print(buttonHistory[i]);
-        Serial.print(", ");
-    }
-    Serial.println("]");
-#endif
-}
-
-void checkKonami()
-{
-    //check for konami code
-    for (int i = 0; i < 10; i++)
-    {
-        if (buttonHistory[i] != konami[i])
-            return;
-    }
-
-    //clear buttons
-    for (int i = 0; i < 10; i++)
-    {
-        buttonHistory[i] = 0;
-    }
-
-    playKonamiTone();
-    buttonTone = !buttonTone;
-}
 
 void checkButtons()
 {
@@ -66,7 +22,6 @@ void checkButtons()
         {
             lastButtonPressTime = millis();
             powerPressed = true;
-            addButton(BTN_POWER);
 
 #ifdef debug
             Serial.println("Power Pressed");
@@ -86,7 +41,6 @@ void checkButtons()
         {
             lastButtonPressTime = millis();
             fluctuatePressed = true;
-            addButton(BTN_FLUCTUATE);
 
             if (!powerOn())
                 setPower(true);
@@ -108,7 +62,6 @@ void checkButtons()
         {
             lastButtonPressTime = millis();
             oscillatePressed = true;
-            addButton(BTN_OSCILLATE);
 
 #ifdef debug
             Serial.println("Oscillate Pressed");
@@ -125,6 +78,7 @@ void checkButtons()
                 setOscillate(!oscillateOn());
             }
         }
+        //todo - advance oscillate speed when button held
     }
     else
     {
@@ -137,7 +91,6 @@ void checkButtons()
         {
             lastButtonPressTime = millis();
             speedPressed = true;
-            addButton(BTN_SPEED);
 
 #ifdef debug
             Serial.println("Speed Pressed");
@@ -160,7 +113,6 @@ void checkButtons()
         {
             lastButtonPressTime = millis();
             timerPressed = true;
-            addButton(BTN_TIMER);
 
 #ifdef debug
             Serial.println("Timer Pressed");
@@ -181,6 +133,4 @@ void checkButtons()
     {
         timerPressed = false;
     }
-
-    checkKonami();
 }

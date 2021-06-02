@@ -49,15 +49,12 @@ void processIR()
                     setPower(true);
 
                 setFluctuate(!fluctuateOn());
-                addButton(BTN_FLUCTUATE);
                 break;
             case IR_Speed: //speed
                 changeSpeed();
-                addButton(BTN_SPEED);
                 break;
             case IR_Power: //power
                 setPower(!powerOn());
-                addButton(BTN_POWER);
                 break;
             case IR_Timer: //timer
                 if (irCmdRepeated)
@@ -67,14 +64,13 @@ void processIR()
                 }
 
                 changeTimer();
-                addButton(BTN_TIMER);
                 break;
             case IR_Oscillate: //oscillate
                 if (!powerOn())
                     setPower(true);
 
                 setOscillate(!oscillateOn());
-                addButton(BTN_OSCILLATE);
+                //todo - advance oscillate speed if button held
                 break;
             }
 

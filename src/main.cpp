@@ -3,13 +3,13 @@
 #include "modes.h"
 #include "timer.h"
 #include "display.h"
-#include "sounds.h"
 #include "buttons.h"
 #include "ir.h"
 #include "serial.h"
 
 //todo - poweron settings in eeprom
 const int LOOP_TIME = 5; //ms
+
 
 uint32_t lastLoopTime;
 
@@ -20,7 +20,6 @@ void timerElapsed()
   setNextDisplayMode();
   checkButtons();
   updateTimer();
-  updateOutputs();
 
   updateDisplay();
 }
@@ -32,9 +31,6 @@ void setup()
   setupDisplay();
   setupOutputs();
   setupIR();
-  setupBuzzer();
-
-  playOnTone();
 }
 
 void loop()
@@ -44,6 +40,8 @@ void loop()
     lastLoopTime = millis();
     timerElapsed();
   }
+
+  updateOutputs();
 
   processIR();
   processSerial();

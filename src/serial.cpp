@@ -5,9 +5,12 @@
 
 byte received;
 
+//todo - commands to set / get oscillate speed
+
 void setupSerial()
 {
     Serial.begin(115200);
+    Serial.println("Serial Started.");
 }
 
 void sendStatus()
@@ -94,22 +97,22 @@ void processSerial()
 
         //Speeds
         case 'l':
-            setSpeed(SPEED_LOW);
+            setSpeed(FAN_SPEED_LOW);
             break;
         case 'm':
-            setSpeed(SPEED_MED);
+            setSpeed(FAN_SPEED_MED);
             break;
         case 'h':
-            setSpeed(SPEED_HIGH);
+            setSpeed(FAN_SPEED_HIGH);
             break;
         case 'L':
-            setSpeedWithPowerOn(SPEED_LOW);
+            setSpeedWithPowerOn(FAN_SPEED_LOW);
             break;
         case 'M':
-            setSpeedWithPowerOn(SPEED_MED);
+            setSpeedWithPowerOn(FAN_SPEED_MED);
             break;
         case 'H':
-            setSpeedWithPowerOn(SPEED_HIGH);
+            setSpeedWithPowerOn(FAN_SPEED_HIGH);
             break;
         case '0':
         case '1':
