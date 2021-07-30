@@ -6,11 +6,7 @@ const int FAN_SPEED_LOW = 1;
 const int FAN_SPEED_MED = 2;
 const int FAN_SPEED_HIGH = 3;
 
-const int OSCILLATE_SPEED_LOW = 180;
-const int OSCILLATE_SPEED_MED = 70;
-const int OSCILLATE_SPEED_HIGH = 30;
-
-
+const int OSCILLATE_SPEED_ON = 91;
 
 void setupOutputs();
 void updateOutputs();

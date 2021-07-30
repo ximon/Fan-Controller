@@ -4,6 +4,8 @@
 #include "modes.h"
 #include "timer.h"
 
+#define debug
+
 bool buttonTone = false;
 
 bool powerPressed;
@@ -13,9 +15,7 @@ bool speedPressed;
 bool timerPressed;
 unsigned int lastButtonPressTime;
 
-
-void checkButtons()
-{
+void checkPowerButton() { 
     if (!digitalRead(Power_Button))
     {
         if (!powerPressed)
@@ -35,15 +35,15 @@ void checkButtons()
         powerPressed = false;
     }
 
-    if (!digitalRead(Fluctuate_Button))
+}
+
+void checkFluctuateButton(){ 
+        if (!digitalRead(Fluctuate_Button))
     {
         if (!fluctuatePressed)
         {
             lastButtonPressTime = millis();
             fluctuatePressed = true;
-
-            if (!powerOn())
-                setPower(true);
 
 #ifdef debug
             Serial.println("Fluctuate Pressed");
@@ -55,7 +55,9 @@ void checkButtons()
     {
         fluctuatePressed = false;
     }
+}
 
+void checkOscillateButton(){
     if (!digitalRead(Oscillate_Button))
     {
         if (!oscillatePressed)
@@ -66,17 +68,9 @@ void checkButtons()
 #ifdef debug
             Serial.println("Oscillate Pressed");
 #endif
-
-            //this one is different, turning on turns on the oscillation, so toggling it turns it back off
-            if (!powerOn())
-            {
-                setPower(true);
-                setOscillate(true);
-            }
-            else
-            {
-                setOscillate(!oscillateOn());
-            }
+           
+            setOscillate(!oscillateOn());
+            
         }
         //todo - advance oscillate speed when button held
     }
@@ -84,7 +78,9 @@ void checkButtons()
     {
         oscillatePressed = false;
     }
+}
 
+void checkSpeedButton() {
     if (!digitalRead(Speed_Button))
     {
         if (!speedPressed)
@@ -96,17 +92,15 @@ void checkButtons()
             Serial.println("Speed Pressed");
 #endif
 
-            if (!powerOn())
-                setPower(true);
-            else
-                changeSpeed();
+            changeSpeed();
         }
     }
     else
     {
         speedPressed = false;
     }
-
+}
+void checkTimerButton() { 
     if (!digitalRead(Timer_Button))
     {
         if (!timerPressed)
@@ -119,18 +113,26 @@ void checkButtons()
 #endif
 
             changeTimer();
+            return;
         }
-        else
+        
+        if (millis() - 1000 > lastButtonPressTime && lastButtonPressTime > 0)
         {
-            if (millis() - 1000 > lastButtonPressTime && lastButtonPressTime > 0)
-            {
-                //button is held for 1s+
-                setTimer(TIMER_DISABLED);
-            }
+            //button is held for 1s+
+            setTimer(TIMER_DISABLED);
         }
     }
     else
     {
         timerPressed = false;
     }
+}
+
+void checkButtons()
+{
+    checkPowerButton();
+    checkFluctuateButton();
+    checkOscillateButton();
+    checkSpeedButton();
+    checkTimerButton();
 }

@@ -17,13 +17,7 @@ int fluctuateSpeedMax = FAN_SPEED_HIGH;
 int speed = FAN_SPEED_OFF;  //fan speed
 
 bool oscillate = false; //fan oscillation
-#define OSCILLATE_MIN_ANGLE 5
-#define OSCILLATE_MAX_ANGLE 130
-#define OSCILLATE_START_ANGLE OSCILLATE_MAX_ANGLE /2 + OSCILLATE_MIN_ANGLE
-int oscillateUpdateDelay = OSCILLATE_SPEED_LOW; //ms
-int oscillateAngle = OSCILLATE_START_ANGLE;
-int oscillateDelta = 1;
-unsigned long oscillateLastUpdate;
+
 
 bool fluctuate = false;
 int speedBeforeFluctuate = FAN_SPEED_LOW;
@@ -36,9 +30,6 @@ int speedWithPower = FAN_SPEED_LOW;
 
 void setupOutputs()
 {
-    oscillateServo.attach(Oscillate_Pin);
-    oscillateServo.write(oscillateAngle);
-
     //INPUT so that the pins are Hi-Z
     pinMode(HighSpeed_Pin, INPUT);
     pinMode(MediumSpeed_Pin, INPUT);
@@ -54,9 +45,6 @@ void updateFluctuateSpeed()
     }
 }
 
-bool oscillateNeedsUpdate() { 
-    return millis() - oscillateLastUpdate >= oscillateUpdateDelay;
-}
 
 void updateOutputs()
 {
@@ -69,20 +57,6 @@ void updateOutputs()
     pinMode(HighSpeed_Pin, speedHigh() ? OUTPUT : INPUT);
     pinMode(MediumSpeed_Pin, speedMed() ? OUTPUT : INPUT);
     pinMode(LowSpeed_Pin, speedLow() ? OUTPUT : INPUT);
-
-    if (oscillateOn() && oscillateNeedsUpdate())
-    {
-        oscillateLastUpdate = millis();
-
-        if (oscillateAngle <= OSCILLATE_MIN_ANGLE)
-            oscillateDelta = 1;
-
-        if (oscillateAngle >= OSCILLATE_MAX_ANGLE)
-            oscillateDelta = -1;
-
-        oscillateAngle += oscillateDelta;
-        oscillateServo.write(oscillateAngle);
-    }
 
     if (speedHigh())
         digitalWrite(HighSpeed_Pin, LOW);
@@ -118,7 +92,11 @@ void setFluctuate(bool value)
     Serial.print("Changing Fluctuate from ");
     Serial.print(fluctuate ? "on" : "off");
     Serial.print(" to ");
+    Serial.println(value ? "on" : "off");
 #endif
+
+    if (!powerOn())
+        setPower(true);
 
     fluctuate = value;
 
@@ -127,15 +105,12 @@ void setFluctuate(bool value)
     {
         speedBeforeFluctuate = speedLevel();
         fluctuateSpeed = speedLevel();
+        return;
     }
     else
     {
-        setSpeed(speedBeforeFluctuate);
+        setSpeed(max(speedBeforeFluctuate, FAN_SPEED_LOW));
     }
-
-#ifdef debug
-    Serial.println(fluctuate ? "on" : "off");
-#endif
 }
 
 void setOscillateWithPowerOn(bool value)
@@ -149,13 +124,21 @@ void setOscillate(bool value)
     Serial.print("Changing Oscillate from ");
     Serial.print(oscillate ? "on" : "off");
     Serial.print(" to ");
+    Serial.println(value ? "on" : "off");
 #endif
+
+    if (!powerOn())
+        setPower(true);
 
     oscillate = value;
 
-#ifdef debug
-    Serial.println(oscillate ? "on" : "off");
-#endif
+    if (oscillate) {
+        oscillateServo.attach(Oscillate_Pin);
+        oscillateServo.write(OSCILLATE_SPEED_ON);
+    } else {
+        oscillateServo.detach();
+    }
+
 }
 
 int speedWithPowerOn()
@@ -182,11 +165,17 @@ void setSpeed(int speedLevel)
     if (speedLevel < FAN_SPEED_OFF)
         speedLevel = FAN_SPEED_OFF;
 
+    if (fluctuateOn())
+        setFluctuate(false);
+
     speed = speedLevel;
 
 #ifdef debug
     Serial.println(speed);
 #endif
+
+    if (!powerOn() && speed != FAN_SPEED_OFF)
+        setPower(true);
 }
 
 void changeSpeed()

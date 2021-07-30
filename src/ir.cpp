@@ -45,9 +45,6 @@ void processIR()
             switch (irCmd)
             {
             case IR_Fluctuate: //fluctuate
-                if (!powerOn())
-                    setPower(true);
-
                 setFluctuate(!fluctuateOn());
                 break;
             case IR_Speed: //speed
@@ -66,9 +63,6 @@ void processIR()
                 changeTimer();
                 break;
             case IR_Oscillate: //oscillate
-                if (!powerOn())
-                    setPower(true);
-
                 setOscillate(!oscillateOn());
                 //todo - advance oscillate speed if button held
                 break;
